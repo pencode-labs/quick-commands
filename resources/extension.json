@@ -1,0 +1,8 @@
+{
+  "id": "quick-commands",
+  "name": "Quick Commands",
+  "version": "0.1.0",
+  "publisher": "Pencode",
+  "description": "Configure and run frequently used terminal commands from the editor title bar.",
+  "entry": "bin/quick-commands"
+}
