@@ -27,7 +27,7 @@ func main() {
 		Actions: []peb.Action{{
 			ID:       "quick-commands",
 			Tooltip:  "Quick Commands",
-			Icon:     "resources/terminal.svg",
+			Icon:     "resources/command.svg",
 			Location: peb.TitleBarRight,
 		}},
 	}, peb.Handlers{
