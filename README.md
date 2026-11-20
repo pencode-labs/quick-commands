@@ -1,31 +1,31 @@
 # Quick Commands
 
-Quick Commands adds a command palette button to the editor title bar. It lets you keep frequently used terminal commands in the extension settings and run them from a drop-down menu.
+Quick Commands adds a button to the editor title bar for running the current project's terminal commands.
 
 ## Configuration
 
-Open the editor settings, select **Extensions**, and choose **Quick Commands**. Set `Commands` to a JSON string containing an array of command objects.
+Store commands in `.pencode/quick-commands.json` under the project root. Open the Quick Commands menu to create the file or edit an existing one. Save it and reopen the menu to load your changes. If you previously saved commands in extension settings, copy the JSON array into the projects that use it.
 
 ```json
 [
   {
     "name": "Run tests",
-    "command": "go test ./..."
+    "command": "go test ./...",
+    "icon": "<svg viewBox='0 0 16 16'><path fill='currentColor' d='M3 2l10 6-10 6z'/></svg>"
   },
   {
     "name": "Start development server",
-    "command": "npm run dev"
+    "command": "npm run dev",
+    "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon@v2.16.0/icons/nodejs/nodejs-original.svg"
   }
 ]
 ```
 
-Each command requires a non-empty `name` and `command` field. The name appears in the drop-down menu. The command is entered into a new terminal session in the current workspace directory.
+Each entry requires a non-empty `name` and `command`. The optional `icon` accepts SVG markup or an HTTP(S) URL to a PNG, JPEG, WebP, or SVG image. Omit it for a text-only menu item.
 
 ## Execution behavior
 
 Selecting a command opens a new terminal tab and sends the configured command to the workspace shell. The extension then sends `exit` after the command, so the terminal tab closes automatically when the command finishes. Long-running commands keep the terminal tab open until they terminate.
-
-The **Configure Quick Commands** menu item opens the extension settings.
 
 ## Build and install
 
