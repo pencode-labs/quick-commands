@@ -21,7 +21,7 @@ func TestProjectCommandsReloadOnOpen(t *testing.T) {
 	}
 	const svg = "<svg viewBox='0 0 16 16'><path d='M1 1h14v14z'/></svg>"
 	path := filepath.Join(first, configPath)
-	data := `[{"name":"A & B","command":"echo \"A\"","icon":"` + svg + `"},{"name":"Web","command":"npm start","icon":"https://example.org/icon.png?a=1&b=2"},{"name":"Plain","command":"ls"}]`
+	data := `[{"name":"A & B","command":"echo \"A\"","icon":"` + svg + `"},{"name":"Web","command":"npm start","cwd":"apps/web & tools","icon":"https://example.org/icon.png?a=1&b=2"},{"name":"Plain","command":"ls"}]`
 	if err := os.WriteFile(path, []byte(data), 0o644); err != nil {
 		t.Fatal(err)
 	}
@@ -29,13 +29,16 @@ func TestProjectCommandsReloadOnOpen(t *testing.T) {
 		t.Fatal(err)
 	}
 	menu := menuView(first).HTML
-	for _, want := range []string{"A &amp; B", `data-pencode-terminal-command="echo &#34;A&#34;"`, "data:image/svg+xml;base64," + base64.StdEncoding.EncodeToString([]byte(svg)), `src="https://example.org/icon.png?a=1&amp;b=2"`, `data-pencode-href="` + configPath + `"`} {
+	for _, want := range []string{"A &amp; B", `data-pencode-terminal-command="echo &#34;A&#34;"`, `data-pencode-terminal-command="npm start" data-pencode-terminal-cwd="apps/web &amp; tools"`, "data:image/svg+xml;base64," + base64.StdEncoding.EncodeToString([]byte(svg)), `src="https://example.org/icon.png?a=1&amp;b=2"`, `data-pencode-href="` + configPath + `"`} {
 		if !strings.Contains(menu, want) {
 			t.Fatalf("missing %q in %s", want, menu)
 		}
 	}
 	if strings.Count(menu, "<img") != 2 || strings.Count(menu, `data-pencode-action="run-terminal"`) != 3 {
 		t.Fatal(menu)
+	}
+	if strings.Count(menu, `data-pencode-terminal-cwd=`) != 1 {
+		t.Fatal("only the configured command should have a working directory", menu)
 	}
 	for _, project := range []string{second, ""} {
 		if menu := menuView(project).HTML; strings.Contains(menu, "run-terminal") {

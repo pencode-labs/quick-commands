@@ -19,6 +19,7 @@ type command struct {
 	Name    string `json:"name"`
 	Command string `json:"command"`
 	Icon    string `json:"icon,omitempty"`
+	CWD     string `json:"cwd,omitempty"`
 }
 
 const configPath = ".pencode/quick-commands.json"
@@ -147,6 +148,10 @@ func menuView(project string) *peb.EditorView {
 	for i, item := range commands {
 		body.WriteString(`<button data-ref="command-` + strconv.Itoa(i) + `" data-pencode-action="run-terminal" data-pencode-terminal-command="`)
 		body.WriteString(html.EscapeString(item.Command))
+		if item.CWD != "" {
+			body.WriteString(`" data-pencode-terminal-cwd="`)
+			body.WriteString(html.EscapeString(item.CWD))
+		}
 		body.WriteString(`" type="button" role="menuitem">`)
 		if src := iconSource(item.Icon); src != "" {
 			body.WriteString(`<img alt="" src="` + src + `">`)

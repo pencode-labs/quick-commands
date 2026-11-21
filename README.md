@@ -16,6 +16,7 @@ Store commands in `.pencode/quick-commands.json` under the project root. Open th
   {
     "name": "Start development server",
     "command": "npm run dev",
+    "cwd": "apps/web",
     "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon@v2.16.0/icons/nodejs/nodejs-original.svg"
   }
 ]
@@ -25,7 +26,9 @@ Each entry requires a non-empty `name` and `command`. The optional `icon` accept
 
 ## Execution behavior
 
-Selecting a command opens a new terminal tab and sends the configured command to the workspace shell. The extension then sends `exit` after the command, so the terminal tab closes automatically when the command finishes. Long-running commands keep the terminal tab open until they terminate.
+Set the optional `cwd` field to start a command in a specific directory. Relative paths are resolved from the project root, and absolute paths refer to the machine running the workspace. An empty or omitted `cwd` uses the project root.
+
+Selecting a command opens a new terminal tab and sends the configured command to the workspace shell. When the command finishes, the terminal stays open so you can review the output and run more commands. Close the tab or enter `exit` to end the shell session.
 
 ## Build and install
 
