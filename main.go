@@ -5,13 +5,13 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"html"
 	"net/url"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
 
+	"github.com/onix-engine/onix/html/markup"
 	"github.com/pencode-labs/pencode/peb"
 )
 
@@ -122,44 +122,39 @@ func iconSource(value string) string {
 		return "data:image/svg+xml;base64," + base64.StdEncoding.EncodeToString([]byte(value))
 	}
 	if u, err := url.Parse(value); err == nil && u.Hostname() != "" && (u.Scheme == "http" || u.Scheme == "https") {
-		return html.EscapeString(value)
+		return value
 	}
 	return ""
 }
 
 func menuView(project string) *peb.EditorView {
-	const start = `<div class="quick-commands-menu" role="menu">`
+	var b markup.Builder
+	b.Open("div", "class", "quick-commands-menu", "role", "menu")
 	view := &peb.EditorView{CSS: menuCSS}
 	if !filepath.IsAbs(project) {
-		view.HTML = start + `<p>Open a project to use Quick Commands.</p></div>`
-		return view
-	}
-	commands, err := readCommands(project)
-	if os.IsNotExist(err) {
-		view.HTML = start + `<button data-ref="create" type="button" role="menuitem">Create Quick Commands configuration</button></div>`
+		b.TextElement("p", "Open a project to use Quick Commands.")
+	} else if commands, err := readCommands(project); os.IsNotExist(err) {
+		b.TextElement("button", "Create Quick Commands configuration", "data-ref", "create", "type", "button", "role", "menuitem")
 		view.Events = []peb.EditorBinding{{Ref: "create", Kind: "click"}}
-		return view
-	}
-	var body strings.Builder
-	body.WriteString(start)
-	if err != nil {
-		body.WriteString(`<p>` + configPath + `: ` + html.EscapeString(err.Error()) + `</p>`)
-	}
-	for i, item := range commands {
-		body.WriteString(`<button data-ref="command-` + strconv.Itoa(i) + `" data-pencode-action="run-terminal" data-pencode-terminal-command="`)
-		body.WriteString(html.EscapeString(item.Command))
-		if item.CWD != "" {
-			body.WriteString(`" data-pencode-terminal-cwd="`)
-			body.WriteString(html.EscapeString(item.CWD))
+	} else {
+		if err != nil {
+			b.TextElement("p", configPath+": "+err.Error())
 		}
-		body.WriteString(`" type="button" role="menuitem">`)
-		if src := iconSource(item.Icon); src != "" {
-			body.WriteString(`<img alt="" src="` + src + `">`)
+		for i, item := range commands {
+			button := b.Open("button", "data-ref", "command-"+strconv.Itoa(i), "data-pencode-action", "run-terminal", "data-pencode-terminal-command", item.Command, "type", "button", "role", "menuitem")
+			if item.CWD != "" {
+				button.SetAttr("data-pencode-terminal-cwd", item.CWD)
+			}
+			if src := iconSource(item.Icon); src != "" {
+				b.Element("img", "alt", "", "src", src)
+			}
+			b.TextElement("span", item.Name)
+			b.End()
 		}
-		body.WriteString(`<span>` + html.EscapeString(item.Name) + `</span></button>`)
+		b.TextElement("button", "Edit Quick Commands configuration", "data-ref", "configure", "data-pencode-href", configPath, "type", "button", "role", "menuitem")
 	}
-	body.WriteString(`<button data-ref="configure" data-pencode-href="` + configPath + `" type="button" role="menuitem">Edit Quick Commands configuration</button></div>`)
-	view.HTML = body.String()
+	b.End()
+	view.HTML = b.String()
 	return view
 }
 

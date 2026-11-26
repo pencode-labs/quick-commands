@@ -29,7 +29,7 @@ func TestProjectCommandsReloadOnOpen(t *testing.T) {
 		t.Fatal(err)
 	}
 	menu := menuView(first).HTML
-	for _, want := range []string{"A &amp; B", `data-pencode-terminal-command="echo &#34;A&#34;"`, `data-pencode-terminal-command="npm start" data-pencode-terminal-cwd="apps/web &amp; tools"`, "data:image/svg+xml;base64," + base64.StdEncoding.EncodeToString([]byte(svg)), `src="https://example.org/icon.png?a=1&amp;b=2"`, `data-pencode-href="` + configPath + `"`} {
+	for _, want := range []string{"A &amp; B", `data-pencode-terminal-command="echo &quot;A&quot;"`, `data-pencode-terminal-command="npm start" data-pencode-terminal-cwd="apps/web &amp; tools"`, "data:image/svg+xml;base64," + base64.StdEncoding.EncodeToString([]byte(svg)), `src="https://example.org/icon.png?a=1&amp;b=2"`, `data-pencode-href="` + configPath + `"`} {
 		if !strings.Contains(menu, want) {
 			t.Fatalf("missing %q in %s", want, menu)
 		}
